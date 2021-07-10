@@ -15,8 +15,8 @@ func handleRequests(){
     router.HandleFunc("/", routes.Index).Methods(http.MethodGet)
 	api := router.PathPrefix("/api/v1").Subrouter()
     api.HandleFunc("/rates", routes.GetAllRates).Methods(http.MethodGet)
-    api.HandleFunc("/rates/{code}", routes.GetRatesByCode)
     api.HandleFunc("/rates/convert", routes.ConvertRates).Queries("base", "{base}", "amount", "{amount:[0-999]+}").Methods(http.MethodGet)
+    api.HandleFunc("/rates/{code}", routes.GetRatesByCode)
     log.Fatal(http.ListenAndServe(":3000", router))
 }
 

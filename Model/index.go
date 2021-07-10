@@ -17,6 +17,6 @@ type Response struct {
 type Response1 struct {
 	Message			string	`json:"message"`
 	Success			bool	`json:"success"`
-	Base			string	`json:"based"`
+	Base			string	`json:"base"`
 	Data			map[string]float64	`json:"data"`
 }
