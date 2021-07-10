@@ -2,9 +2,16 @@
 A simple golang api for currency conversion
 
 ## Installation & Run
+```
+# Dependencies Used
+github.com/gorilla/mux //Used this dependency in other to expose api url with query parameter
+github.com/mattn/go-sqlite3 //Used this create and connect to my sqlite database
+```
+
+## Installation & Run
 ```bash
 # Download this project
-git clone github.com/collins169/ExchangeRateAPI
+git clone https://github.com/collins169/ExchangeRateAPI.git
 ```
 
 ```bash
