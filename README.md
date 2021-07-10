@@ -4,7 +4,7 @@ A simple golang api for currency conversion
 ## Installation & Run
 ```bash
 # Download this project
-go get github.com/collins169/ExchangeRateAPI
+git clone github.com/collins169/ExchangeRateAPI
 ```
 
 ```bash
