@@ -17,7 +17,7 @@ func handleRequests(){
     api.HandleFunc("/rates", routes.GetAllRates).Methods(http.MethodGet)
     api.HandleFunc("/rates/{code}", routes.GetRatesByCode)
     api.HandleFunc("/rates/convert", routes.ConvertRates).Queries("base", "{base}", "amount", "{amount:[0-999]+}").Methods(http.MethodGet)
-    log.Fatal(http.ListenAndServe(":10000", router))
+    log.Fatal(http.ListenAndServe(":3000", router))
 }
 
 func main() {
