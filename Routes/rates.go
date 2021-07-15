@@ -8,8 +8,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -22,8 +20,7 @@ func GetAllRates(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Content-Type", "application/json")
 	log.Println("About to fetch all Rates")
 	response := model.Response{}
-	conn := database.Connect()
-	rates, err := database.FindAll(conn)
+	rates, err := database.FindAll()
 	if err != nil {
 		response.Message = err.Error()
 		response.Success = false
@@ -42,8 +39,7 @@ func GetAllRates(w http.ResponseWriter, r *http.Request){
 func GetRatesByCode(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Content-Type", "application/json")
 	log.Println("About to fetch all Rates by currency code")
-	vars := mux.Vars(r)
-    code := vars["code"]
+    code := r.URL.Query().Get("code")
 	response := model.Response1{}
 	if !database.IsCurrencyAllowed(code){
 		response.Message = fmt.Sprintf("Currency %s is not allowed", code)
@@ -52,8 +48,7 @@ func GetRatesByCode(w http.ResponseWriter, r *http.Request){
 		json.NewEncoder(w).Encode(response)
 		return
 	}
-	conn := database.Connect()
-	rates, err := database.FindByCode(conn, code)
+	rates, err := database.FindByCode(code)
 	if err != nil {
 		response.Message = err.Error()
 		response.Success = false
@@ -76,9 +71,8 @@ func GetRatesByCode(w http.ResponseWriter, r *http.Request){
 func ConvertRates(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Content-Type", "application/json")
 	log.Println("About to fetch all Rates by currency code")
-	vars := mux.Vars(r)
-    code := vars["base"]
-    amount := vars["amount"]
+    code := r.URL.Query().Get("base")
+    amount := r.URL.Query().Get("amount")
 	response := model.Response1{}
 	if !database.IsCurrencyAllowed(code){
 		response.Message = fmt.Sprintf("Currency %s is not allowed", code)
@@ -87,8 +81,7 @@ func ConvertRates(w http.ResponseWriter, r *http.Request){
 		json.NewEncoder(w).Encode(response)
 		return
 	}
-	conn := database.Connect()
-	rates, err := database.FindByCode(conn, code)
+	rates, err := database.FindByCode(code)
 	if err != nil {
 		response.Message = err.Error()
 		response.Success = false

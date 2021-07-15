@@ -1,0 +1,44 @@
+[
+ {
+  "id": 1,
+  "currency_from": "NGN",
+  "currency_to": "GHS",
+  "conversion_value": 0.014,
+  "inverse_conversion_value": 69.26
+ },
+ {
+  "id": 2,
+  "currency_from": "NGN",
+  "currency_to": "KSH",
+  "conversion_value": 0.26,
+  "inverse_conversion_value": 3.8
+ },
+ {
+  "id": 3,
+  "currency_from": "GHS",
+  "currency_to": "NGN",
+  "conversion_value": 69.26,
+  "inverse_conversion_value": 0.014
+ },
+ {
+  "id": 4,
+  "currency_from": "GHS",
+  "currency_to": "KSH",
+  "conversion_value": 18.2,
+  "inverse_conversion_value": 0.055
+ },
+ {
+  "id": 5,
+  "currency_from": "KSH",
+  "currency_to": "NGN",
+  "conversion_value": 3.8,
+  "inverse_conversion_value": 0.26
+ },
+ {
+  "id": 6,
+  "currency_from": "KSH",
+  "currency_to": "GHS",
+  "conversion_value": 0.055,
+  "inverse_conversion_value": 18.2
+ }
+]

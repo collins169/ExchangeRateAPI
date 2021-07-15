@@ -4,20 +4,17 @@ import (
 	database "ExchangeRate/configuration"
 	"log"
 	"net/http"
-	"github.com/gorilla/mux"
 	routes "ExchangeRate/routes"
 )
 
 
 func handleRequests(){
 	// creates a new instance of a mux router
-    router := mux.NewRouter()
-    router.HandleFunc("/", routes.Index).Methods(http.MethodGet)
-	api := router.PathPrefix("/api/v1").Subrouter()
-    api.HandleFunc("/rates", routes.GetAllRates).Methods(http.MethodGet)
-    api.HandleFunc("/rates/convert", routes.ConvertRates).Queries("base", "{base}", "amount", "{amount:[0-999]+}").Methods(http.MethodGet)
-    api.HandleFunc("/rates/{code}", routes.GetRatesByCode)
-    log.Fatal(http.ListenAndServe(":3000", router))
+    http.HandleFunc("/api/v1/", routes.Index)
+    http.HandleFunc("/api/v1/rates", routes.GetAllRates)
+    http.HandleFunc("/api/v1/rates/convert", routes.ConvertRates)
+    http.HandleFunc("/api/v1/rates/", routes.GetRatesByCode)
+    log.Fatal(http.ListenAndServe(":3000", nil))
 }
 
 func main() {

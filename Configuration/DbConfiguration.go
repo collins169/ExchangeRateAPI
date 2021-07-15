@@ -1,110 +1,71 @@
 package configuration
 
 import (
-	"database/sql"
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"os"
 
-	_ "github.com/mattn/go-sqlite3"
 	model "ExchangeRate/model"
+	// _ "github.com/mattn/go-sqlite3"
 )
 
 func IntialDB(){
-	os.Remove("sqlite-database.db") // I delete the file to avoid duplicated records. 
+	os.Remove("rates.json") // I delete the file to avoid duplicated records. 
 	// SQLite is a file based database.
 
 	log.Println("Creating sqlite-database.db...")
-	file, err := os.Create("sqlite-database.db") // Create SQLite file
+	file, err := os.Create("rates.json") // Create SQLite file
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	file.Close()
-	log.Println("sqlite-database.db created")
-
-	database, _ := sql.Open("sqlite3", "./sqlite-database.db") // Open the created SQLite File
-	defer database.Close() // Defer Closing the database
-	CreateTable(database)
+	log.Println("rates.json created")
+	// CreateTable(database)
 
 	log.Println("Let insert the rates records")
-	InsertRecord(database, &model.ExchangeRate{0,"NGN", "GHS", 0.014, 69.26})
-	InsertRecord(database, &model.ExchangeRate{0,"NGN", "KSH", 0.26, 3.80})
-	InsertRecord(database, &model.ExchangeRate{0,"GHS", "NGN", 69.26, 0.014})
-	InsertRecord(database, &model.ExchangeRate{0,"GHS", "KSH", 18.20, 0.055})
-	InsertRecord(database, &model.ExchangeRate{0,"KSH", "NGN", 3.80, 0.26})
-	InsertRecord(database, &model.ExchangeRate{0,"KSH", "GHS", 0.055, 18.20})
-}
-func Connect() *sql.DB {
-	database, err := sql.Open("sqlite3", "./sqlite-database.db")
-	if err != nil{
-		panic(err)
-	}
-	return database
+	rates := [] *model.ExchangeRate{}
+	rates = append(rates, &model.ExchangeRate{1,"NGN", "GHS", 0.014, 69.26})
+	rates = append(rates, &model.ExchangeRate{2,"NGN", "KSH", 0.26, 3.80})
+	rates = append(rates, &model.ExchangeRate{3,"GHS", "NGN", 69.26, 0.014})
+	rates = append(rates, &model.ExchangeRate{4,"GHS", "KSH", 18.20, 0.055})
+	rates = append(rates, &model.ExchangeRate{5,"KSH", "NGN", 3.80, 0.26})
+	rates = append(rates, &model.ExchangeRate{6,"KSH", "GHS", 0.055, 18.20})
+	data, _ := json.MarshalIndent(rates, "", " ")
+	_ = ioutil.WriteFile("rates.json", data, 0644)
 }
 
-func Disconnect(db *sql.DB) error{
-	return db.Close()
-}
-
-func CreateTable(db *sql.DB) {
-	createStudentTableSQL := `CREATE TABLE exchange_rates (
-		"id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,		
-		"currency_from" TEXT,
-		"currency_to" TEXT,
-		"conversion_value" TEXT,
-		"inverse_conversion_value" NUMERIC
-	  );` // SQL Statement for Create Table
-
-	log.Println("Create Exchange Rates table...")
-	statement, err := db.Prepare(createStudentTableSQL) // Prepare SQL Statement
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	statement.Exec() // Execute SQL Statements
-	log.Println("exchange rates table created")
-}
-
-func InsertRecord(db *sql.DB, rates *model.ExchangeRate){
-	log.Println("Inserting rates into database")
-	query := `INSERT INTO exchange_rates (currency_from, currency_to, conversion_value, inverse_conversion_value) VALUES (:1, :2, :3, :4)`
-	
-	_ , err := db.Exec(query, &rates.CurrencyFrom, &rates.CurrencyTo, &rates.ConversionValue, &rates.InverseConversionValue)
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-}
-
-func FindAll(db * sql.DB) (*[]model.ExchangeRate, error ){
+func FindAll() (*[]model.ExchangeRate, error ){
 	rates := []model.ExchangeRate{}
-	rows, err := db.Query("SELECT id, currency_from, currency_to, conversion_value, inverse_conversion_value FROM exchange_rates")
-	if err != nil{
-		log.Fatalln(err.Error())
+	data, _ := ioutil.ReadFile("rates.json")
+	err := json.Unmarshal(data, &rates)
+	if err != nil {
 		return &rates, err
 	}
-	defer rows.Close()
-	for rows.Next(){
-		rate := model.ExchangeRate{}
-		rows.Scan(&rate.Id, &rate.CurrencyFrom, &rate.CurrencyTo, &rate.ConversionValue, &rate.InverseConversionValue)
-		rates = append(rates, rate)
-	}
-	rows.Close()
+	log.Println(rates)
 	return &rates, nil
 }
 
-func FindByCode(db * sql.DB, code string) (*[]model.ExchangeRate, error) {
+func FindByCode(code string) (*[]model.ExchangeRate, error) {
 	rates := []model.ExchangeRate{}
-	rows, err := db.Query("SELECT id, currency_from, currency_to, conversion_value, inverse_conversion_value FROM exchange_rates where currency_from = :1", code)
+	rates2 := []model.ExchangeRate{}
+	data, err := ioutil.ReadFile("rates.json")
 	if err != nil{
 		log.Fatalln(err.Error())
-		return &rates, err
+		return &rates2, err
 	}
-	defer rows.Close()
-	for rows.Next(){
-		rate := model.ExchangeRate{}
-		rows.Scan(&rate.Id, &rate.CurrencyFrom, &rate.CurrencyTo, &rate.ConversionValue, &rate.InverseConversionValue)
-		rates = append(rates, rate)
+
+	err2 := json.Unmarshal(data, &rates)
+	if err2 != nil {
+		return &rates2, err2
 	}
-	rows.Close()
-	return &rates, nil
+
+	for _, rate := range rates {
+		if rate.CurrencyFrom == code {
+			rates2 = append(rates2, rate)
+		}
+	}
+	return &rates2, nil
 }
 
 func IsCurrencyAllowed(code string) bool{
